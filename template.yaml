@@ -1,0 +1,137 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+    textract-boleto-reader
+
+Globals:
+    Function:
+        Timeout: 15
+        Runtime: python3.8
+        Tracing: Active
+        Environment:
+            Variables:
+                LOG_LEVEL: INFO
+                POWERTOOLS_LOGGER_SAMPLE_RATE: 0.1
+                POWERTOOLS_LOGGER_LOG_EVENT: true
+                POWERTOOLS_METRICS_NAMESPACE: TextractBoletoReader
+
+Resources:
+    BoletoBucket:
+        Type: AWS::S3::Bucket
+        DependsOn:
+            - BoletoBucketNotificationTopicPolicy
+        Properties:
+            BucketName: !Sub textract-boleto-reader-boletobucket-${AWS::AccountId}
+            NotificationConfiguration:
+                TopicConfigurations:
+                    -   Event: s3:ObjectCreated:*
+                        Topic: !Ref BoletoBucketNotificationTopic
+
+    BoletoBucketNotificationTopic:
+        Type: AWS::SNS::Topic
+
+    BoletoBucketNotificationTopicPolicy:
+        Type: AWS::SNS::TopicPolicy
+        Properties:
+            PolicyDocument:
+                Version: '2012-10-17'
+                Statement:
+                    -   Effect: Allow
+                        Principal:
+                            Service: s3.amazonaws.com
+                        Action: sns:Publish
+                        Resource: !Ref BoletoBucketNotificationTopic
+                        Condition:
+                            ArnEquals: 
+                                aws:SourceArn: !Sub arn:${AWS::Partition}:s3:::textract-boleto-reader-boletobucket-${AWS::AccountId}
+            Topics:
+                - !Ref BoletoBucketNotificationTopic
+
+    StartBoletoAnalysis:
+        Type: AWS::Serverless::Function
+        Properties:
+            Handler: app.start_boleto_analysis.lambda_handler
+            CodeUri: src
+            Description: Start Boleto Analysis function
+            Policies:
+                - TextractDetectAnalyzePolicy: {}
+                - S3ReadPolicy:
+                    BucketName: !Ref BoletoBucket
+            Events:
+                BoletoBucketNotificationEvent:
+                    Type: SNS
+                    Properties:
+                        Topic: !Ref BoletoBucketNotificationTopic
+            Environment:
+                Variables:
+                    TEXTRACT_NOTIFICATION_TOPIC: !Ref TextractNotificationTopic
+                    TEXTRACT_NOTIFICATION_ROLE: !GetAtt TextractNotificationRole.Arn
+
+    TextractNotificationRole:
+        Type: AWS::IAM::Role
+        Properties:
+            AssumeRolePolicyDocument:
+                Version: '2012-10-17'
+                Statement:
+                    -   Effect: Allow
+                        Principal:
+                            Service: textract.amazonaws.com  
+                        Action: sts:AssumeRole
+            Policies:
+                -   PolicyName: PublishNotification
+                    PolicyDocument:
+                        Version: '2012-10-17'
+                        Statement:
+                            -   Effect: Allow
+                                Action: sns:Publish
+                                Resource: !Ref TextractNotificationTopic
+
+    TextractNotificationTopic:
+        Type: AWS::SNS::Topic
+
+    GetBoletoAnalysis:
+        Type: AWS::Serverless::Function
+        Properties:
+            Handler: app.get_boleto_analysis.lambda_handler
+            CodeUri: src
+            Description: Get Boleto Analysis function
+            Policies:
+                - TextractGetResultPolicy: {}
+                - SNSPublishMessagePolicy:
+                    TopicName: !GetAtt AnalysisResultTopic.TopicName
+            Events:
+                TextractNotificationEvent:
+                    Type: SNS
+                    Properties:
+                        Topic: !Ref TextractNotificationTopic
+            Environment:
+                Variables:
+                    ANALYSIS_RESULT_TOPIC: !Ref AnalysisResultTopic
+
+    AnalysisResultTopic:
+        Type: AWS::SNS::Topic
+
+Outputs:
+    BoletoBucketArn:
+        Description: "Boleto Bucket ARN"
+        Value: !GetAtt BoletoBucket.Arn
+
+    BoletoBucketNotificationTopicArn:
+        Description: "Boleto Bucket Notification Topic ARN"
+        Value: !Ref BoletoBucketNotificationTopic
+
+    StartBoletoAnalysisFunction:
+        Description: "Start Boleto Analysis Function ARN"
+        Value: !GetAtt StartBoletoAnalysis.Arn
+
+    TextractNotificationTopicArn:
+        Description: "Textract Notification Topic ARN"
+        Value: !Ref TextractNotificationTopic
+
+    GetBoletoAnalysisFunction:
+        Description: "Get Boleto Analysis Function ARN"
+        Value: !GetAtt GetBoletoAnalysis.Arn
+
+    AnalysisResultTopicArn:
+        Description: "Analysis Result Topic ARN"
+        Value: !Ref AnalysisResultTopic

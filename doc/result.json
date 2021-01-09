@@ -1,0 +1,38 @@
+{
+    "DocumentLocation": {
+      "S3ObjectName": "BOLETO_19541490_066369169.PDF",
+      "S3Bucket": "textract-boleto-reader-boletobucket-999999999999"
+    },
+    "KeyValuePairs": {
+      "Espécie Doc. ": "RC ",
+      "Agência / Código do Beneficiário ": "8541/41906-8 ",
+      "Espécie Moeda ": "R$ ",
+      "Uso do Banco ": "",
+      "Data de Vencimento ": "10/01/2021",
+      "Data do Documento ": "10/01/2021",
+      "N° do Documento ": "19541490 ",
+      "Carteira ": "109 ",
+      "Aceite ": "N ",
+      "Nosso Número ": "109/06636916-9 ",
+      "Data de Processamento ": "09/01/2021",
+      "CNPJ/CPF ": "74.879.565/4789-45 ",
+      "Quantidade Moeda ": "",
+      "Valor Moeda ": "",
+      "(=) Valor Cobrado ": "",
+      "Nome do Beneficiário ": "Loja XYZ S/A - SAO PAULO - SP ",
+      "Nosso Número / Cód. do Documento ": "109/06636916-9 ",
+      "Valor Cobrado ": "597,66 ",
+      "Vencimento ": "10/01/2021",
+      "(+) Outros Acréscimos ": "0,00 ",
+      "Local de Pagamento ": "VÁLIDO ATÉ O VENCIMENTO, PAGUE PREFERENCIALMENTE NO BANCO X",
+      "(=) Valor do Documento ": "597,66 ",
+      "(-) Desconto/ Abatimento ": "0,00 ",
+      "PARCELA : ": "0506 ",
+      "Beneficiário ": "Loja XYZ S/A - SAO PAULO - SP ",
+      "(+) Mora Multa ": "0,00 ",
+      "(-) Outras Deduções ": "0,00 ",
+      "Pagador ": "BRUCE WAYNE 555.444.333-22 ",
+      "Autenticação Mecânica ": "",
+      "BarcodeNumber": "34191090656369169854014190680000684350000059766"
+    }
+  }
