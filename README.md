@@ -1,4 +1,4 @@
-# textract-bankslip-reader
+# textract-boleto-reader
 
 This project aims to show the art of the possible in relation to the use of [Amazon Textract](https://aws.amazon.com/textract/) to read and extract all fields and values from Brazilian bank slips (Boleto), as well as the barcode number.
 
@@ -10,13 +10,13 @@ This project aims to show the art of the possible in relation to the use of [Ama
   <img src="/doc/arch.png">
 </p>
 
-**Sample result (BankSlipAnalysisResultTopic message)**
+**Sample result (BoletoAnalysisResultTopic message)**
 
 ```json
 {
   "DocumentLocation": {
     "S3ObjectName": "BOLETO_19541490_066369169.PDF",
-    "S3Bucket": "textract-bankslip-reader-bankslipbucket-999999999999"
+    "S3Bucket": "textract-boleto-reader-boletobucket-999999999999"
   },
   "KeyValuePairs": {
     "Espécie Doc. ": "RC ",
@@ -80,8 +80,8 @@ This project contains source code and supporting files for a serverless applicat
 Build and deploy your application for the first time by running the following commands in your shell:
 
 ```bash
-textract-bankslip-reader$ make build
-textract-bankslip-reader$ make deploy.guided
+textract-boleto-reader$ make build
+textract-boleto-reader$ make deploy.guided
 ```
 
 The first command will **build** the source of your application within a Docker container. The second command will **package and deploy** your application to AWS. Guided deploy means SAM CLI will ask you about the name of your deployment/stack, AWS Region, and whether you want to save your choices, so that you can use `make deploy` next time.
@@ -93,8 +93,8 @@ Tests are defined in the `tests` folder in this project, and we use Pytest as th
 Make sure you install dev dependencies before you run tests with `make dev`:
 
 ```bash
-textract-bankslip-reader$ make dev
-textract-bankslip-reader$ make test
+textract-boleto-reader$ make dev
+textract-boleto-reader$ make test
 ```
 
 ## Cleanup
@@ -102,7 +102,7 @@ textract-bankslip-reader$ make test
 To delete the sample application that you created, use the AWS CLI. Assuming you used your project name for the stack name, you can run the following:
 
 ```bash
-textract-bankslip-reader$ aws cloudformation delete-stack --stack-name textract-bankslip-reader
+textract-boleto-reader$ aws cloudformation delete-stack --stack-name textract-boleto-reader
 ```
 
 # Appendix
@@ -126,5 +126,5 @@ textract-bankslip-reader$ aws cloudformation delete-stack --stack-name textract-
 Pipenv takes care of isolating dev dependencies and app dependencies. As SAM CLI requires a `requirements.txt` file, you'd need to generate one if new app dependencies have been added:
 
 ```bash
-textract-bankslip-reader$ pipenv lock -r > src/requirements.txt
+textract-boleto-reader$ pipenv lock -r > src/requirements.txt
 ```

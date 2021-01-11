@@ -1,7 +1,7 @@
 {
     "DocumentLocation": {
       "S3ObjectName": "BOLETO_19541490_066369169.PDF",
-      "S3Bucket": "textract-bankslip-reader-bankslipbucket-999999999999"
+      "S3Bucket": "textract-boleto-reader-boletobucket-999999999999"
     },
     "KeyValuePairs": {
       "Espécie Doc. ": "RC ",

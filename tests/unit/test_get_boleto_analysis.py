@@ -1,6 +1,6 @@
 import json
 from botocore.stub import ANY
-from src.app import get_bankslip_analysis
+from src.app import get_boleto_analysis
 
 def test_lambda_handler(sns_textract_notification, lambda_context, textract_response, textract_stub, sns_stub):
 
@@ -17,6 +17,6 @@ def test_lambda_handler(sns_textract_notification, lambda_context, textract_resp
     )
 
     with textract_stub, sns_stub:
-        ret = get_bankslip_analysis.lambda_handler(sns_textract_notification, lambda_context)
+        ret = get_boleto_analysis.lambda_handler(sns_textract_notification, lambda_context)
 
     assert ret[0]["KeyValuePairs"]["BarcodeNumber"] == "23793381286002890582082000063303882800000068040"

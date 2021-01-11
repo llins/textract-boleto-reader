@@ -1,6 +1,6 @@
 from uuid import uuid4
 from botocore.stub import ANY
-from src.app import start_bankslip_analysis
+from src.app import start_boleto_analysis
 
 def test_lambda_handler(sns_s3_put_event_notification, lambda_context, textract_stub):
 
@@ -13,6 +13,6 @@ def test_lambda_handler(sns_s3_put_event_notification, lambda_context, textract_
     )
 
     with textract_stub:
-        ret = start_bankslip_analysis.lambda_handler(sns_s3_put_event_notification, lambda_context)
+        ret = start_boleto_analysis.lambda_handler(sns_s3_put_event_notification, lambda_context)
 
     assert ret == {"JobIds": [jobId]}
