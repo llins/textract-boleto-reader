@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-    textract-boleto-reader
+    textract-bankslip-reader
 
 Globals:
     Function:
@@ -13,24 +13,24 @@ Globals:
                 LOG_LEVEL: INFO
                 POWERTOOLS_LOGGER_SAMPLE_RATE: 0.1
                 POWERTOOLS_LOGGER_LOG_EVENT: true
-                POWERTOOLS_METRICS_NAMESPACE: TextractBoletoReader
+                POWERTOOLS_METRICS_NAMESPACE: TextractBankSlipReader
 
 Resources:
-    BoletoBucket:
+    BankSlipBucket:
         Type: AWS::S3::Bucket
         DependsOn:
-            - BoletoBucketNotificationTopicPolicy
+            - BankSlipBucketNotificationTopicPolicy
         Properties:
-            BucketName: !Sub textract-boleto-reader-boletobucket-${AWS::AccountId}
+            BucketName: !Sub textract-bankslip-reader-bankslipbucket-${AWS::AccountId}
             NotificationConfiguration:
                 TopicConfigurations:
                     -   Event: s3:ObjectCreated:*
-                        Topic: !Ref BoletoBucketNotificationTopic
+                        Topic: !Ref BankSlipBucketNotificationTopic
 
-    BoletoBucketNotificationTopic:
+    BankSlipBucketNotificationTopic:
         Type: AWS::SNS::Topic
 
-    BoletoBucketNotificationTopicPolicy:
+    BankSlipBucketNotificationTopicPolicy:
         Type: AWS::SNS::TopicPolicy
         Properties:
             PolicyDocument:
@@ -40,28 +40,28 @@ Resources:
                         Principal:
                             Service: s3.amazonaws.com
                         Action: sns:Publish
-                        Resource: !Ref BoletoBucketNotificationTopic
+                        Resource: !Ref BankSlipBucketNotificationTopic
                         Condition:
                             ArnEquals: 
-                                aws:SourceArn: !Sub arn:${AWS::Partition}:s3:::textract-boleto-reader-boletobucket-${AWS::AccountId}
+                                aws:SourceArn: !Sub arn:${AWS::Partition}:s3:::textract-bankslip-reader-bankslipbucket-${AWS::AccountId}
             Topics:
-                - !Ref BoletoBucketNotificationTopic
+                - !Ref BankSlipBucketNotificationTopic
 
-    StartBoletoAnalysis:
+    StartBankSlipAnalysis:
         Type: AWS::Serverless::Function
         Properties:
-            Handler: app.start_boleto_analysis.lambda_handler
+            Handler: app.start_bankslip_analysis.lambda_handler
             CodeUri: src
-            Description: Start Boleto Analysis function
+            Description: Start Bank Slip Analysis function
             Policies:
                 - TextractDetectAnalyzePolicy: {}
                 - S3ReadPolicy:
-                    BucketName: !Ref BoletoBucket
+                    BucketName: !Ref BankSlipBucket
             Events:
-                BoletoBucketNotificationEvent:
+                BankSlipBucketNotificationEvent:
                     Type: SNS
                     Properties:
-                        Topic: !Ref BoletoBucketNotificationTopic
+                        Topic: !Ref BankSlipBucketNotificationTopic
             Environment:
                 Variables:
                     TEXTRACT_NOTIFICATION_TOPIC: !Ref TextractNotificationTopic
@@ -89,12 +89,12 @@ Resources:
     TextractNotificationTopic:
         Type: AWS::SNS::Topic
 
-    GetBoletoAnalysis:
+    GetBankSlipAnalysis:
         Type: AWS::Serverless::Function
         Properties:
-            Handler: app.get_boleto_analysis.lambda_handler
+            Handler: app.get_bankslip_analysis.lambda_handler
             CodeUri: src
-            Description: Get Boleto Analysis function
+            Description: Get Bank Slip Analysis function
             Policies:
                 - TextractGetResultPolicy: {}
                 - SNSPublishMessagePolicy:
@@ -112,25 +112,25 @@ Resources:
         Type: AWS::SNS::Topic
 
 Outputs:
-    BoletoBucketArn:
-        Description: "Boleto Bucket ARN"
-        Value: !GetAtt BoletoBucket.Arn
+    BankSlipBucketArn:
+        Description: "Bank Slip Bucket ARN"
+        Value: !GetAtt BankSlipBucket.Arn
 
-    BoletoBucketNotificationTopicArn:
-        Description: "Boleto Bucket Notification Topic ARN"
-        Value: !Ref BoletoBucketNotificationTopic
+    BankSlipBucketNotificationTopicArn:
+        Description: "Bank Slip Bucket Notification Topic ARN"
+        Value: !Ref BankSlipBucketNotificationTopic
 
-    StartBoletoAnalysisFunction:
-        Description: "Start Boleto Analysis Function ARN"
-        Value: !GetAtt StartBoletoAnalysis.Arn
+    StartBankSlipAnalysisFunction:
+        Description: "Start Bank Slip Analysis Function ARN"
+        Value: !GetAtt StartBankSlipAnalysis.Arn
 
     TextractNotificationTopicArn:
         Description: "Textract Notification Topic ARN"
         Value: !Ref TextractNotificationTopic
 
-    GetBoletoAnalysisFunction:
-        Description: "Get Boleto Analysis Function ARN"
-        Value: !GetAtt GetBoletoAnalysis.Arn
+    GetBankSlipAnalysisFunction:
+        Description: "Get Bank Slip Analysis Function ARN"
+        Value: !GetAtt GetBankSlipAnalysis.Arn
 
     AnalysisResultTopicArn:
         Description: "Analysis Result Topic ARN"

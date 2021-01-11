@@ -5,7 +5,7 @@ import boto3
 from aws_lambda_powertools import Logger, Metrics, Tracer
 from .utils import textract, client
 
-tracer = Tracer(service="get_boleto_analysis")
+tracer = Tracer(service="get_bankslip_analysis")
 logger = Logger()
 metrics = Metrics()
 

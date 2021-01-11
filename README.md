@@ -1,4 +1,4 @@
-# aws-boleto-reader
+# textract-bankslip-reader
 
 This project contains source code and supporting files for a serverless application that you can deploy with the SAM CLI. It includes [Lambda Powertools for operational best practices](https://github.com/awslabs/aws-lambda-powertools-python), and the following files and folders.
 
@@ -31,8 +31,8 @@ If you prefer to use an integrated development environment (IDE) to build and te
 Build and deploy your application for the first time by running the following commands in your shell:
 
 ```bash
-aws-boleto-reader$ make build
-aws-boleto-reader$ make deploy.guided
+textract-bankslip-reader$ make build
+textract-bankslip-reader$ make deploy.guided
 ```
 
 The first command will **build** the source of your application within a Docker container. The second command will **package and deploy** your application to AWS. Guided deploy means SAM CLI will ask you about the name of your deployment/stack, AWS Region, and whether you want to save your choices, so that you can use `make deploy` next time.
@@ -42,7 +42,7 @@ The first command will **build** the source of your application within a Docker 
 Whenever you change your application code, you'll have to run build command:
 
 ```bash
-aws-boleto-reader$ make build
+textract-bankslip-reader$ make build
 ```
 
 The SAM CLI installs dependencies defined in `hello_world/requirements.txt`, creates a deployment package, and saves it in the `.aws-sam/build` folder.
@@ -50,7 +50,7 @@ The SAM CLI installs dependencies defined in `hello_world/requirements.txt`, cre
 Test a single function by invoking it directly with a test event:
 
 ```bash
-aws-boleto-reader$ make invoke
+textract-bankslip-reader$ make invoke
 ```
 
 > An event is a JSON document that represents the input that the function receives from the event source. Test events are included in the `events` folder in this project.
@@ -58,8 +58,8 @@ aws-boleto-reader$ make invoke
 The SAM CLI can also emulate your application's API. Use the `make run` to run the API locally on port 3000.
 
 ```bash
-aws-boleto-reader$ make run
-aws-boleto-reader$ curl http://localhost:3000/hello
+textract-bankslip-reader$ make run
+textract-bankslip-reader$ curl http://localhost:3000/hello
 ```
 
 The SAM CLI reads the application template to determine the API's routes and the functions that they invoke. The `Events` property on each function's definition includes the route and method for each path.
@@ -80,7 +80,7 @@ To simplify troubleshooting, SAM CLI has a command called `sam logs`. `sam logs`
 `NOTE`: This command works for all AWS Lambda functions; not just the ones you deploy using SAM.
 
 ```bash
-aws-boleto-reader$ sam logs -n HelloWorldFunction --stack-name <Name-of-your-deployed-stack> --tail
+textract-bankslip-reader$ sam logs -n HelloWorldFunction --stack-name <Name-of-your-deployed-stack> --tail
 ```
 
 You can find more information and examples about filtering Lambda function logs in the [SAM CLI Documentation](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-logging.html).
@@ -92,8 +92,8 @@ Tests are defined in the `tests` folder in this project, and we use Pytest as th
 Make sure you install dev dependencies before you run tests with `make dev`:
 
 ```bash
-aws-boleto-reader$ make dev
-aws-boleto-reader$ make test
+textract-bankslip-reader$ make dev
+textract-bankslip-reader$ make test
 ```
 
 ## Cleanup
@@ -101,7 +101,7 @@ aws-boleto-reader$ make test
 To delete the sample application that you created, use the AWS CLI. Assuming you used your project name for the stack name, you can run the following:
 
 ```bash
-aws-boleto-reader$ aws cloudformation delete-stack --stack-name aws-boleto-reader
+textract-bankslip-reader$ aws cloudformation delete-stack --stack-name textract-bankslip-reader
 ```
 
 # Appendix
@@ -134,5 +134,5 @@ We included a `Makefile` for your convenience - You can find all commands you ca
 Pipenv takes care of isolating dev dependencies and app dependencies. As SAM CLI requires a `requirements.txt` file, you'd need to generate one if new app dependencies have been added:
 
 ```bash
-aws-boleto-reader$ pipenv lock -r > hello_world/requirements.txt
+textract-bankslip-reader$ pipenv lock -r > hello_world/requirements.txt
 ```
