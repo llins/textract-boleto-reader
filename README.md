@@ -1,5 +1,7 @@
 # textract-bankslip-reader
 
+This project aims to show the art of the possible in relation to the use of [Amazon Textract](https://aws.amazon.com/textract/) to read and extract all fields and values from bank slips, as well as the barcode number.
+
 <p align="center">
   <img src="/doc/arch.png">
 </p>
