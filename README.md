@@ -1,5 +1,10 @@
 # textract-bankslip-reader
 
+<p align="center">
+  <img src="/doc/arch.png">
+</p>
+
+
 ## File Structure
 
 This project contains source code and supporting files for a serverless application that you can deploy with the SAM CLI. It includes [Lambda Powertools for operational best practices](https://github.com/awslabs/aws-lambda-powertools-python), and the following files and folders.
