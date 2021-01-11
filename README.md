@@ -65,19 +65,10 @@ textract-bankslip-reader$ aws cloudformation delete-stack --stack-name textract-
 
 [Metrics utility](https://awslabs.github.io/aws-lambda-powertools-python/core/metrics/) captures cold start metric of your Lambda invocation, and could add additional metrics to help you understand your application KPIs - You can visualize them in Amazon CloudWatch.
 
-## Makefile
-
-We included a `Makefile` for your convenience - You can find all commands you can use by running `make`. Under the hood, we're using SAM CLI commands to run these common tasks:
-
-* **`make build`**: `sam build --use-container`
-* **`make deploy.guided`**: `sam deploy --guided`
-* **`make invoke`**: `sam local invoke HelloWorldFunction --event events/hello_world_event.json`
-* **`make run`**: `sam local start-api`
-
 ## Sync project with function dependencies
 
 Pipenv takes care of isolating dev dependencies and app dependencies. As SAM CLI requires a `requirements.txt` file, you'd need to generate one if new app dependencies have been added:
 
 ```bash
-textract-bankslip-reader$ pipenv lock -r > hello_world/requirements.txt
+textract-bankslip-reader$ pipenv lock -r > src/requirements.txt
 ```
