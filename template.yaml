@@ -98,7 +98,7 @@ Resources:
             Policies:
                 - TextractGetResultPolicy: {}
                 - SNSPublishMessagePolicy:
-                    TopicName: !GetAtt AnalysisResultTopic.TopicName
+                    TopicName: !GetAtt BankSlipAnalysisResultTopic.TopicName
             Events:
                 TextractNotificationEvent:
                     Type: SNS
@@ -106,9 +106,9 @@ Resources:
                         Topic: !Ref TextractNotificationTopic
             Environment:
                 Variables:
-                    ANALYSIS_RESULT_TOPIC: !Ref AnalysisResultTopic
+                    ANALYSIS_RESULT_TOPIC: !Ref BankSlipAnalysisResultTopic
 
-    AnalysisResultTopic:
+    BankSlipAnalysisResultTopic:
         Type: AWS::SNS::Topic
 
 Outputs:
@@ -132,6 +132,6 @@ Outputs:
         Description: "Get Bank Slip Analysis Function ARN"
         Value: !GetAtt GetBankSlipAnalysis.Arn
 
-    AnalysisResultTopicArn:
+    BankSlipAnalysisResultTopicArn:
         Description: "Analysis Result Topic ARN"
-        Value: !Ref AnalysisResultTopic
+        Value: !Ref BankSlipAnalysisResultTopic
