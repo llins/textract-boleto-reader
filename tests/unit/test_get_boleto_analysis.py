@@ -1,6 +1,29 @@
+import pytest
 import json
-from botocore.stub import ANY
-from src.app import get_boleto_analysis
+from botocore.stub import Stubber, ANY
+from src import get_boleto_analysis
+
+@pytest.fixture
+def textract_stub():
+    with Stubber(get_boleto_analysis.textract) as stubber:
+        yield stubber
+        stubber.assert_no_pending_responses()
+
+@pytest.fixture
+def sns_stub():
+    with Stubber(get_boleto_analysis.sns) as stubber:
+        yield stubber
+        stubber.assert_no_pending_responses()
+
+@pytest.fixture
+def sns_textract_notification():
+    with open("./events/sns_textract_notification.json", "r") as fp:
+        return json.load(fp)
+
+@pytest.fixture
+def textract_response():
+    with open("./events/textract_response.json", "r") as fp:
+        return json.load(fp)
 
 def test_lambda_handler(sns_textract_notification, lambda_context, textract_response, textract_stub, sns_stub):
 

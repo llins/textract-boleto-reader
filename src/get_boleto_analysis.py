@@ -1,31 +1,51 @@
-import time
 import json
-from . import client
+import re
+import os
+import boto3
+import time
+from aws_lambda_powertools import Logger, Metrics, Tracer
 
-def start_document_analysis(s3_bucket_name, s3_object_name, notification_topic, notification_role):
-    response = None
-    textract = client.textract()
-    response = textract.start_document_analysis(
-        DocumentLocation={
-            "S3Object": {
-                "Bucket": s3_bucket_name,
-                "Name": s3_object_name
+tracer = Tracer(service="get_boleto_analysis")
+logger = Logger()
+metrics = Metrics()
+
+session = boto3.Session()
+textract = session.client("textract")
+sns = session.client("sns")
+
+analysis_result_topic = os.environ['ANALYSIS_RESULT_TOPIC']
+
+@metrics.log_metrics(capture_cold_start_metric=True)
+@logger.inject_lambda_context
+@tracer.capture_lambda_handler
+def lambda_handler(event: dict, context: any):
+    try:
+        responses = []
+
+        for record in event["Records"]:
+            
+            textract_notification = json.loads(record["Sns"]["Message"])
+            analysis = _get_document_analysis(textract_notification["JobId"])
+            lines = _get_lines(analysis)
+            kv_map = _get_kv_map(analysis)
+            kv_map["BarcodeNumber"] = _find_barcode_number(lines)
+
+            response = {
+                "DocumentLocation" : textract_notification["DocumentLocation"],
+                "KeyValuePairs" : kv_map
             }
-        },
-        FeatureTypes=[
-            "FORMS"
-        ],
-        NotificationChannel={
-            "SNSTopicArn": notification_topic,
-            "RoleArn": notification_role
-        }
-    )
 
-    return response["JobId"]
+            sns.publish(TopicArn=analysis_result_topic, Message=json.dumps(response))
 
-def get_document_analysis(job_id):
+            responses.append(response)
+
+        return responses
+    except Exception as e:
+        logger.exception(e)
+        raise
+
+def _get_document_analysis(job_id):
     pages = []
-    textract = client.textract()
     response = textract.get_document_analysis(JobId=job_id)
     
     status = response["JobStatus"]
@@ -49,7 +69,7 @@ def get_document_analysis(job_id):
 
     return pages
 
-def get_lines(response):
+def _get_lines(response):
     lines = []
 
     for resultPage in response:
@@ -59,19 +79,19 @@ def get_lines(response):
 
     return lines
 
-def get_kv_map(response):
+def _get_kv_map(response):
     kv_map = {}
-    key_map, value_map, block_map = __get_key_value_block_maps(response)
+    key_map, value_map, block_map = _get_key_value_block_maps(response)
 
     for _, key_block in key_map.items():
-        value_block = __find_value_block(key_block, value_map)
-        key = __get_text(key_block, block_map)
-        val = __get_text(value_block, block_map)
+        value_block = _find_value_block(key_block, value_map)
+        key = _get_text(key_block, block_map)
+        val = _get_text(value_block, block_map)
         kv_map[key] = val
 
     return kv_map
 
-def __get_key_value_block_maps(response):
+def _get_key_value_block_maps(response):
     key_map = {}
     value_map = {}
     block_map = {}
@@ -88,7 +108,7 @@ def __get_key_value_block_maps(response):
 
     return key_map, value_map, block_map
 
-def __find_value_block(key_block, value_map):
+def _find_value_block(key_block, value_map):
     for relationship in key_block["Relationships"]:
         if relationship["Type"] == "VALUE":
             for value_id in relationship["Ids"]:
@@ -96,7 +116,7 @@ def __find_value_block(key_block, value_map):
 
     return value_block
 
-def __get_text(result, blocks_map):
+def _get_text(result, blocks_map):
     text = ""
     if "Relationships" in result:
         for relationship in result["Relationships"]:
@@ -110,3 +130,11 @@ def __get_text(result, blocks_map):
                             text += "X "    
                                 
     return text
+
+def _find_barcode_number(lines):
+    for line in lines:
+        m = re.search(r'^(\d{5})\D*(\d{5})\D*(\d{5})\D*(\d{6})\D*(\d{5})\D*(\d{6})\D*(\d)\D*(\d{14})$', line)
+        if(m):
+            return "".join(m.groups())
+
+    return ""

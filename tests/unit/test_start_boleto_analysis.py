@@ -1,6 +1,19 @@
+import pytest
+import json
 from uuid import uuid4
-from botocore.stub import ANY
-from src.app import start_boleto_analysis
+from botocore.stub import Stubber, ANY
+from src import start_boleto_analysis
+
+@pytest.fixture
+def textract_stub():
+    with Stubber(start_boleto_analysis.textract) as stubber:
+        yield stubber
+        stubber.assert_no_pending_responses()
+
+@pytest.fixture
+def sns_s3_put_event_notification():
+    with open("./events/sns_s3_put_event_notification.json", "r") as fp:
+        return json.load(fp)
 
 def test_lambda_handler(sns_s3_put_event_notification, lambda_context, textract_stub):
 
