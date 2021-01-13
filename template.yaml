@@ -14,7 +14,9 @@ Globals:
                 LOG_LEVEL: INFO
                 POWERTOOLS_LOGGER_SAMPLE_RATE: 0.1
                 POWERTOOLS_LOGGER_LOG_EVENT: true
+                POWERTOOLS_SERVICE_NAME: boletoReader
                 POWERTOOLS_METRICS_NAMESPACE: TextractBoletoReader
+                # PYTHONPROFILEIMPORTTIME: 1
 
 Resources:
     BoletoBucket:
@@ -53,7 +55,7 @@ Resources:
         Properties:
             Handler: start_boleto_analysis.lambda_handler
             CodeUri: src
-            Description: Start Bank Slip Analysis function
+            Description: Start Boleto Analysis function
             Policies:
                 - TextractDetectAnalyzePolicy: {}
                 - S3ReadPolicy:
@@ -95,7 +97,7 @@ Resources:
         Properties:
             Handler: get_boleto_analysis.lambda_handler
             CodeUri: src
-            Description: Get Bank Slip Analysis function
+            Description: Get Boleto Analysis function
             Policies:
                 - TextractGetResultPolicy: {}
                 - SNSPublishMessagePolicy:
@@ -114,15 +116,15 @@ Resources:
 
 Outputs:
     BoletoBucketArn:
-        Description: "Bank Slip Bucket ARN"
+        Description: "Boleto Bucket ARN"
         Value: !GetAtt BoletoBucket.Arn
 
     BoletoBucketNotificationTopicArn:
-        Description: "Bank Slip Bucket Notification Topic ARN"
+        Description: "Boleto Bucket Notification Topic ARN"
         Value: !Ref BoletoBucketNotificationTopic
 
     StartBoletoAnalysisFunction:
-        Description: "Start Bank Slip Analysis Function ARN"
+        Description: "Start Boleto Analysis Function ARN"
         Value: !GetAtt StartBoletoAnalysis.Arn
 
     TextractNotificationTopicArn:
@@ -130,7 +132,7 @@ Outputs:
         Value: !Ref TextractNotificationTopic
 
     GetBoletoAnalysisFunction:
-        Description: "Get Bank Slip Analysis Function ARN"
+        Description: "Get Boleto Analysis Function ARN"
         Value: !GetAtt GetBoletoAnalysis.Arn
 
     BoletoAnalysisResultTopicArn:
